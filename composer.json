@@ -1,6 +1,7 @@
 {
     "name": "leung/laravel-adminer",
     "description": "adminer for laravel5",
+    "license": "MIT",
     "authors": [
         {
             "name": "simple",
