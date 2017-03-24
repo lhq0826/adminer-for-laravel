@@ -1,0 +1,16 @@
+{
+    "name": "simple/laravel-adminer",
+    "description": "adminer for laravel5",
+    "authors": [
+        {
+            "name": "simple",
+            "email": "simple@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Simple\\Adminer\\": "src/"
+        }
+    }
+}
