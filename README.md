@@ -9,7 +9,7 @@ OR
 Update `composer.json`
 ```php
 "require": {
-    "leung/laravel-adminer": "^1.0"
+    "leung/laravel-adminer": "^1.1"
 },
 ```
 
