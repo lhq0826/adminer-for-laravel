@@ -5,6 +5,13 @@
 ```php
 composer require leung/laravel-adminer
 ```
+OR
+Update `composer.json`
+```php
+"require": {
+    "leung/laravel-adminer": "^1.0"
+},
+```
 
 open your `config/app.php` and add this line in providers section
 ```php
@@ -17,7 +24,17 @@ protected $except = [
      'adminer'
  ];
  ```
-add route
+add middleware Example
 ```php
-Route::any('adminer', '\Simple\Adminer\Controllers\AdminerController@index');
+protected $middlewareGroups = [
+    ...
+    'adminer' => [
+        \App\Http\Middleware\EncryptCookies::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+
+        // you may create customized middleware to fit your needs
+        ...
+    ],
+];
 ```
