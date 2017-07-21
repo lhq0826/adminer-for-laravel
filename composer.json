@@ -1,5 +1,5 @@
 {
-    "name": "leung/laravel-adminer",
+    "name": "Artistan/laravel-adminer",
     "description": "adminer for laravel5",
     "license": "MIT",
     "authors": [
@@ -8,10 +8,19 @@
             "email": "simple@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "vrana/adminer": "^4.3"
+    },
     "autoload": {
         "psr-4": {
             "Simple\\Adminer\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Simple\\Adminer\\AdminerServiceProvider"
+            ]
         }
     }
 }
