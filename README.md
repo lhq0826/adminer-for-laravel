@@ -24,17 +24,7 @@ protected $except = [
      'adminer'
  ];
  ```
-add middleware Example
+Middleware is added in service provider, to override this you may add a adminer route to your App routes.php
 ```php
-protected $middlewareGroups = [
-    ...
-    'adminer' => [
-        \App\Http\Middleware\EncryptCookies::class,
-        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-        \Illuminate\Session\Middleware\StartSession::class,
-
-        // you may create customized middleware to fit your needs
-        ...
-    ],
-];
+    Route::any('adminer', '\Simple\Adminer\AdminerController@index')->middleware('custom_middleware'); // where you defined your middleware in app/Http/Kernel.php
 ```
