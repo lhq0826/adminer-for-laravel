@@ -8,9 +8,7 @@
             "email": "simple@gmail.com"
         }
     ],
-    "require": {
-        "vrana/adminer": "^4.3"
-    },
+    "require": {},
     "autoload": {
         "psr-4": {
             "Simple\\Adminer\\": "src/"
