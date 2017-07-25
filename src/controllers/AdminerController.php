@@ -1,13 +1,16 @@
 <?php
 namespace Simple\Adminer\Controllers;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
 
 class AdminerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('adminer');
+        if(\Route::hasMiddlewareGroup('adminer')){
+            $this->middleware('adminer');
+        }
+    	// AdminerServiceProvider::register holds the middleware register so it does not need addeed manually.
     }
 
     public function index()
