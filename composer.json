@@ -13,5 +13,13 @@
         "psr-4": {
             "Simple\\Adminer\\": "src/"
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "php artisan adminer:update"
+        ],
+        "post-update-cmd": [
+            "php artisan adminer:update"
+        ]
     }
 }
