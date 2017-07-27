@@ -129,7 +129,4 @@ class UpdateCommand extends Command
     private function sed($string){
         echo shell_exec('LC_ALL=C sed -i "" -E \'s/([)\;]|^)'.$string.'/\1adminer_'.$string.'/g\' '.$this->filename);
     }
-    
-    
-    
 }
