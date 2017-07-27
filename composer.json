@@ -1,17 +1,28 @@
 {
     "name": "leung/laravel-adminer",
-    "description": "adminer for laravel5",
+    "description": "adminer for laravel5.*",
     "license": "MIT",
     "authors": [
         {
-            "name": "simple",
+            "name": "leung",
             "email": "simple@gmail.com"
+        },
+        {
+            "name": "Artistan",
+            "email": "artistan@gmail.com"
         }
     ],
     "require": {},
     "autoload": {
         "psr-4": {
             "Simple\\Adminer\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Simple\\Adminer\\AdminerServiceProvider"
+            ]
         }
     },
     "scripts": {
