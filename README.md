@@ -12,39 +12,56 @@ OR
 #### Add directly to your `composer.json`
 ```json
 "require": {
-    "leung/laravel-adminer": "^1.1"
+    "leung/laravel-adminer": "^2.0"
 },
 ```
 
 ## Providers
 
-#### Laravel <5.4 
+### Laravel <5.4 
 open your `config/app.php` and add this line in providers section
 ```php
 Simple\Adminer\AdminerServiceProvider::class
 ```
-#### Laravel 5.5 providers 
+###### OR prevent it being on production 
+open your `app/Providers/AppServiceProvider.php` and add this line in the `register()` function
+```php
+if ($this->app->environment() !== 'production') {
+    $this->app->register(\Simple\Adminer\AdminerServiceProvider::class);
+}
+```
+
+### Laravel 5.5 providers 
 auto included via automatic package discovery
 ```php
    // no need to add anything!!!
 ```
 
----
-## Middleware
+## Update adminer.php
 
-#### Middleware is added in service provider 
+#### Command line update
+```bash
+php artisan adminer:update
+```
+
+_Composer update also automates running this script_
+
+---
+## [Optional] Middleware
+
+#### Middleware is added in via the service provider 
 to override this you may add a adminer route to your App routes.php
 
 ```php
-    Route::any('adminer', '\Simple\Adminer\AdminerController@index')->middleware('custom_middleware'); // where you defined your middleware in app/Http/Kernel.php
+    Route::any('adminer', '\Simple\Adminer\AdminerController@index')->middleware('adminer_custom_middleware'); // where you defined your middleware in app/Http/Kernel.php
 ```
 
-#### [optional] add middleware group Example
-
+#### Add middleware group example
+to add a custom middleware group you will need to add it to middlewareGroups in your `app/Http/Kernel.php`
 ```php
 protected $middlewareGroups = [
     ...
-    'adminer' => [
+    'adminer_custom_middleware' => [
         \App\Http\Middleware\EncryptCookies::class,
         \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
         \Illuminate\Session\Middleware\StartSession::class,
@@ -56,18 +73,10 @@ protected $middlewareGroups = [
 ```
 
 #### Modify app/Http/Middleware/VerifyCsrfToken.php
-add adminer to $except array if you are using the optional adminer group
+also add adminer to $except array if you are using the example optional adminer group
 ```php
 protected $except = [
      'adminer'
  ];
  ```
 
-## Update adminer.php
-
-#### Command line updates
-```bash
-php artisan adminer:update
-```
-
-_Composer install and update also automates running this script_
