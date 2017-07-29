@@ -39,7 +39,7 @@ auto included via automatic package discovery
 
 ## Update adminer.php
 
-#### Command line update
+#### Linux command line update
 ```bash
 php artisan adminer:update
 ```
