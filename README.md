@@ -44,8 +44,18 @@ auto included via automatic package discovery
 php artisan adminer:update
 ```
 
-_Composer update also automates running this script_
+You can configure your composer.json to do this after each commit:
 
+```js
+"scripts": {
+    "post-install-cmd": [
+        "php artisan adminer:update"
+    ],
+    "post-update-cmd": [
+        "php artisan adminer:update"
+    ]
+}
+```
 ---
 ## [Optional] Middleware
 

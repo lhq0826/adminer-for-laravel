@@ -24,13 +24,5 @@
                 "Simple\\Adminer\\AdminerServiceProvider"
             ]
         }
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "php artisan adminer:update"
-        ],
-        "post-update-cmd": [
-            "php artisan adminer:update"
-        ]
     }
 }
