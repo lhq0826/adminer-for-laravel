@@ -38,9 +38,17 @@ class AdminerServiceProvider extends ServiceProvider
 	 */
 	public function register()
 	{
-		$this->app['router']->aliasMiddleware('encrypt_cookies', \Illuminate\Cookie\Middleware\EncryptCookies::class);
-		$this->app['router']->aliasMiddleware('add_queue_cookies', \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class);
-		$this->app['router']->aliasMiddleware('start_session', \Illuminate\Session\Middleware\StartSession::class);
+	    if(!method_exists($this->app['router'],'middleware')) {
+	        // Laravel 5.4 no longer has middleware function on the router class
+            $this->app['router']->aliasMiddleware('encrypt_cookies', \Illuminate\Cookie\Middleware\EncryptCookies::class);
+            $this->app['router']->aliasMiddleware('add_queue_cookies', \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class);
+            $this->app['router']->aliasMiddleware('start_session', \Illuminate\Session\Middleware\StartSession::class);
+        } else {
+            $this->app['router']->middleware('encrypt_cookies', \Illuminate\Cookie\Middleware\EncryptCookies::class);
+            $this->app['router']->middleware('add_queue_cookies', \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class);
+            $this->app['router']->middleware('start_session', \Illuminate\Session\Middleware\StartSession::class);
+        }
+
 
         $this->app->singleton(
             'command.adminer.update',
