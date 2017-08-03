@@ -44,11 +44,6 @@ class UpdateCommand extends Command
     protected $filename;
 
     /**
-     * @var String $tmpfile
-     */
-    protected $tmpfile;
-
-    /**
      * The console command description.
      *
      * @var string
@@ -133,7 +128,6 @@ class UpdateCommand extends Command
      * @param $string
      */
     private function sed($string){
-        echo shell_exec('LC_ALL=C sed -e \'s/\([)\;]|^\)'.$string.'/\1adminer_'.$string.'/g\' '.$this->filename.' > '.$this->tmpfile.' ');
-        echo shell_exec('rm -f '.$this->filename.'; mv '.$this->tmpfile.' '.$this->filename.'');
+        echo shell_exec('LC_ALL=C sed -i -r \'s/([)\;]|^)'.$string.'/\1adminer_'.$string.'/g\' '.$this->filename);
     }
 }
