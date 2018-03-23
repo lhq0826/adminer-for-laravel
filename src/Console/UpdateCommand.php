@@ -76,7 +76,7 @@ class UpdateCommand extends Command
             $this->error('Adminer: latest release no found??');
             return;
         }
-        $latest_version = json_decode((string) $latest_version->getBody())->name;
+        $latest_version = json_decode((string) $latest_version->getBody())->tag_name;
         try {
             $last_version = $this->files->get($this->version);
         } catch (\Exception $e) {
