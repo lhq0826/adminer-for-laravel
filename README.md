@@ -63,7 +63,7 @@ You can configure your composer.json to do this after each commit:
 to override this you may add a adminer route to your App routes.php
 
 ```php
-    Route::any('adminer', '\Simple\Adminer\AdminerController@index')->middleware('adminer_custom_middleware'); // where you defined your middleware in app/Http/Kernel.php
+    Route::any('adminer', '\Simple\Adminer\Controllers\AdminerController@index')->middleware('adminer_custom_middleware'); // where you defined your middleware in app/Http/Kernel.php
 ```
 
 #### Add middleware group example
