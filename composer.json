@@ -1,29 +1,34 @@
 {
-    "name": "leung/laravel-adminer",
-    "description": "adminer for laravel5.*",
+    "name": "hgists/lumener",
+    "description": "Adminer for Lumen/Laravel 5.*",
+    "keywords": ["adminer", "lumen", "laravel"],
     "license": "MIT",
     "authors": [
         {
-            "name": "leung",
-            "email": "simple@gmail.com"
+            "name": "hesham",
+            "email": "heshammeneisi@gmail.com"
         },
         {
-            "name": "Artistan",
-            "email": "artistan@gmail.com"
-        }
+           "name": "leung",
+           "email": "simple@gmail.com"
+       }
     ],
     "require": {
         "guzzlehttp/guzzle": "^6.3"
     },
+    "suggest": {
+        "illuminate/cookie": "Required for Lumen",
+        "illuminate/session": "Required for Lumen"
+    },
     "autoload": {
         "psr-4": {
-            "Simple\\Adminer\\": "src/"
+            "Lumener\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Simple\\Adminer\\AdminerServiceProvider"
+                "Lumener\\LumenerServiceProvider"
             ]
         }
     }

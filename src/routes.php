@@ -1,3 +1,3 @@
 <?php
 
-Route::any('adminer', 'AdminerController@index');
+Route::any('adminer', 'LumenerController@index');
