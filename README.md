@@ -111,7 +111,32 @@ php artisan lumener:stylize --file=/home/Downloads/adminer.css
 php artisan lumener:stylize --url=https://raw.githubusercontent.com/pappu687/adminer-theme/master/adminer.css
 ```
 
-Form themes containing images/JavaScript you will have to copy them manually to your `public` path.
+For themes containing images/JavaScript you will have to copy the files manually to your `public` path.
+
+### Plugins
+Install any [plugin](https://www.adminer.org/en/plugins/)
+```php
+php artisan lumener:plugin [OPTIONAL --file] [OPTIONAL --url]
+```
+Plugins must be enabled in `config('lumener.adminer_plugins')`. Refer to the config section.
+#### Default
+
+If no arguments provided, this command will install the plugin.php file which is required for any plugins to run.
+```php
+php artisan lumener:plugin
+```
+
+#### File
+
+```php
+php artisan lumener:plugin --file=/home/Downloads/designer.php
+```
+
+#### URL
+
+```php
+php artisan lumener:plugin --url=https://raw.github.com/vrana/adminer/master/plugins/database-hide.php
+```
 ***
 ## Custom Config
 You don't need to create a config file as all configuration parameters have a fallback value. You can follow the following instructions to customize the configuration.
@@ -122,17 +147,51 @@ $app->configure('lumener');
 ```
 ### Config File (defaults)
 ```php
-<?php
 return [
   /* For Lumen, a route that has ("as" => "lumener") will be automatically
     merged into main route while keeping its original path and middleware.
     For Laravel, this MUST be identical to any route with custom middleware. */
+  "name" => "Lumener",
   "route" => "lumener",
   "redundant_vars" => ['redirect','cookie','view'],
   // adminer_version can be exact (e.g. v4.7.1) if version_source is NOT "url"
   "adminer_version" => "https://api.github.com/repos/vrana/adminer/releases/latest",
   "version_source" => "url",
-  "adminer_source" => "http://www.adminer.org/latest.php",
+
+  // Check https://github.com/vrana/adminer/releases for custom releases
+  //  (e.g. adminer-{version}-mysql-en.php or editor-{version}.php)
+  //  This format supports v4.2.5+
+  "adminer_source" => "https://github.com/vrana/adminer/releases/download/v{version}/adminer-{version}.php",
+
+
+  /**
+   * Plugins
+   */
+
+  // plugin.php is required to use any plugin
+  // Automatically used when no file/url is supplied for the plugin command
+  "plugin_source" => "https://raw.github.com/vrana/adminer/master/plugins/plugin.php",
+
+  // Uncomment this section to enable plugins
+  // "adminer_plugins" => [
+  //   // No constructor arguments
+  //   // "AdminerDumpXml" => [],
+  //   // With constructor arguments
+  //   // "AdminerFileUpload" => ["data/"],
+  // ],
+
+
+  /**
+   * Autologin Settings
+   */
+  "adminer_autologin" => false,
+
+  // Uncomment this section to override .env values
+  // "db_host" => "127.0.0.1",
+  // "db_port" => 3306,
+  // "db_username" => "root",
+  // "db_password" => "toor",
+  // "db_database" => "mydatabase"
 ];
 
 ```

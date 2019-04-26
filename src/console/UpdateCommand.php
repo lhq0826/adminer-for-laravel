@@ -52,7 +52,7 @@ class UpdateCommand extends Command
         $this->files = $files;
 
         $resources = realpath(dirname(__FILE__).'/../resources');
-        $this->version = $resources.'/version';
+        // $this->version = $resources.'/version';
         $this->filename = $resources.'/adminer.php';
         $this->tmpfile = $resources.'/tmp.php';
     }
@@ -68,11 +68,19 @@ class UpdateCommand extends Command
         if ($force) {
             $this->error("Force mode active.");
         }
+        $current_version = false;
         try {
-            $current_version = $this->files->get($this->version);
-        } catch (\Exception $e) {
-            // do not care if file not found...
-            $current_version = false;
+            if (file_exists($this->filename)) {
+                $fn = fopen($this->filename, "r");
+                for ($i=0; !$current_version && $i < 20 && !feof($fn); $i++) {
+                    $line = fgets($fn, 30);
+                    preg_match_all("/@version ((\d([\.-]|$))+)/", $line, $m);
+                    if (!empty($m[1])) {
+                        $current_version = $m[1][0];
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
         }
         if ($current_version) {
             $this->info("Lumener: Current ".$current_version);
@@ -92,7 +100,7 @@ class UpdateCommand extends Command
             ($response ? "\r\n[{$response->getStatusCode()}] {$response->getReasonPhrase()} {(string)$response->getBody()}" : "Connection Failed."));
                 return;
             }
-            $latest_version = json_decode((string) $response->getBody())->tag_name;
+            $latest_version = ltrim(json_decode((string) $response->getBody())->tag_name, 'v');
             $this->info("Lumener: Latest Adminer Version " . $latest_version);
         } else {
             $latest_version = $vsource;
@@ -100,14 +108,16 @@ class UpdateCommand extends Command
         }
         if ($force || !file_exists($this->filename) || $latest_version != $current_version) {
             $this->info("Lumener: Downloading...");
-            $response = $this->get(config(
+            $url = config(
                 'lumener.adminer_source',
-                'http://www.adminer.org/latest.php'
-            ), ['sink' => $this->filename]);
+                'https://github.com/vrana/adminer/releases/download/v{version}/adminer-{version}.php'
+            );
+            $url = str_replace("{version}", ltrim($latest_version, 'v'));
+            $response = $this->get($url, ['sink' => $this->filename]);
             if ($response && $response->getStatusCode() == '200') {
                 info("Renaming redundant variables...");
                 $this->renameRedundant();
-                $this->files->put($this->version, $latest_version);
+                // $this->files->put($this->version, $latest_version);
                 $this->info("Lumener: Updated!");
             } else {
                 $this->error('Lumener: Could not download adminer.'

@@ -15,11 +15,11 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 
 /**
- * A command to update the file for adminer.php
+ * A command to require/update a plugin
  *
  * @author Charles A. Peterson <artistan@gmail.com>
  */
-class StylizeCommand extends Command
+class PluginCommand extends Command
 {
     /**
      * @var Filesystem $files
@@ -32,16 +32,16 @@ class StylizeCommand extends Command
     protected $theme;
 
     /**
-     * @var String $css_path
+     * @var String $plugin_path
      */
-    protected $css_path;
+    protected $plugin_path;
 
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'lumener:stylize {--file=} {--url=}';
+    protected $signature = 'lumener:plugin {--file=} {--url=}';
 
     /**
      * @param Filesystem $files
@@ -52,7 +52,7 @@ class StylizeCommand extends Command
         $resources = realpath(dirname(__FILE__).'/../resources');
         $this->files = $files;
         $this->theme = realpath(dirname(__FILE__).'/../public/adminer.css');
-        $this->css_path = base_path('public/adminer.css');
+        $this->plugin_path = $resources.'/plugins';
         $this->filename = $resources.'/adminer.php';
     }
 
@@ -64,31 +64,31 @@ class StylizeCommand extends Command
     public function handle()
     {
         $url = $this->option('url');
-        if ($url) {
-            $this->info("Downloading theme...");
+        $path = $this->option('file');
+        if ($path) {
+            $this->info("Copying plugin file...");
+        } else {
+            if ($url) {
+                $this->info("Downloading plugin...");
+            } else {
+                $url = config(
+                    'lumener.plugin_source',
+                    'https://raw.github.com/vrana/adminer/master/plugins/plugin.php'
+                );
+            }
             $path = tempnam(sys_get_temp_dir(), 'adminer.css');
             $response = $this->get($url, ['sink' => $path]);
             if ($response && $response->getStatusCode() == '200') {
-                $this->copy($path, $this->css_path);
-                $this->info("Lumener: Theme downloaded.");
+                $this->copy($path, $this->plugin_path);
+                $this->info("Lumener: Plugin downloaded.");
             } else {
-                $this->error('Lumener: Could not retrieve theme file. '
+                $this->error('Lumener: Could not retrieve plugin file. '
                 .
                 ($response ? "\r\n[{$response->getStatusCode()}] {$response->getReasonPhrase()} {(string)$response->getBody()}" : "Connection Failed."));
                 return;
             }
-        } else {
-            $path = $this->option('file');
-            if ($path) {
-                $this->info("Applying theme file...");
-            } else {
-                $this->info("Applying default theme...");
-                $path = $this->theme;
-            }
         }
-        $this->copy($path, $this->css_path);
-        // info("Fixing adminer.css url...");
-        // $this->replace("\\\$I\\[\\]=\\\$Uc", "\$I\\[\\]='/'.\$Uc", $this->filename);
+        $this->copy($path, $this->plugin_path);
     }
 
     /**
@@ -119,27 +119,6 @@ class StylizeCommand extends Command
             echo shell_exec("copy \"{$source}\" \"{$dest}\"");
         } else {
             echo shell_exec("cp \"{$source}\" \"{$dest}\"");
-        }
-    }
-
-    /**
-     * Replace portions of the file
-     * @param  string $pattern
-     * @param  string $replacement
-     * @param  string $file
-     * @return void
-     */
-    private function replace($pattern, $replacement, $file)
-    {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            // TODO: Test this on windows
-            echo shell_exec("cat \"{$file}\" | %{_ -replace \"$pattern\",\"{$replacement}\"} > \"{$file}\"");
-        } else {
-            $rule = '%([/])%';
-            $pattern = preg_replace($rule, '\\\\$0', $pattern);
-            $replacement = preg_replace($rule, '\\\\$0', $replacement);
-            $arg = escapeshellarg("s/{$pattern}/{$replacement}/g");
-            echo shell_exec("LC_ALL=C sed -i -r {$arg} \"{$file}\"");
         }
     }
 }

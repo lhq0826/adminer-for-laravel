@@ -103,23 +103,33 @@ class LumenerServiceProvider extends ServiceProvider
 
 
         $this->app->singleton(
-            'command.adminer.update',
+            'command.lumener.update',
             function ($app) {
                 return new UpdateCommand($app['files']);
             }
         );
         $this->commands(
-            'command.adminer.update'
+            'command.lumener.update'
         );
 
         $this->app->singleton(
-            'command.adminer.stylize',
+            'command.lumener.stylize',
             function ($app) {
                 return new StylizeCommand($app['files']);
             }
         );
         $this->commands(
-            'command.adminer.stylize'
+            'command.lumener.stylize'
+        );
+
+        $this->app->singleton(
+            'command.lumener.plugin',
+            function ($app) {
+                return new PluginCommand($app['files']);
+            }
+        );
+        $this->commands(
+            'command.lumener.plugin'
         );
     }
 
@@ -130,6 +140,10 @@ class LumenerServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('command.adminer.update');
+        return [
+                'command.lumener.update',
+                'command.lumener.stylize',
+                'command.lumener.plugin'
+             ];
     }
 }
