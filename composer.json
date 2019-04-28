@@ -23,7 +23,7 @@
         "illuminate/encryption": ">=5.0",
         "illuminate/http": ">=5.0",
         "illuminate/console": ">=5.0",
-        "guzzlehttp/guzzle": ">=6.0",
+        "guzzlehttp/guzzle": ">=6.0"
     },
     "suggest": {
         "illuminate/cookie": "Suggested for Lumen",

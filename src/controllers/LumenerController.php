@@ -13,6 +13,7 @@ class LumenerController extends Controller
     protected $allowed_dbs;
     protected $protected_dbs;
     protected $request;
+
     public function __construct(Request $request)
     {
         if (method_exists(\Route::class, 'hasMiddlewareGroup')
@@ -25,6 +26,16 @@ class LumenerController extends Controller
         $this->adminer_object = __DIR__.'/../logic/adminer_object.php';
         $this->plugins_path = LUMENER_STORAGE.'/plugins';
         $this->request = $request;
+    }
+
+    public function __call($method, $params)
+    {
+        if (strncasecmp($method, "get", 3) === 0) {
+            $var = preg_replace_callback('/[A-Z]/', function ($c) {
+                return '_'.strtolower($c[0]);
+            }, lcfirst(substr($method, 3)));
+            return $this->$var;
+        }
     }
 
     public function index()
@@ -125,17 +136,18 @@ class LumenerController extends Controller
         return $content;
     }
 
-    private function _runGetBuffer($files, $allowed_exceptions=[E_WARNING])
+    private function _runGetBuffer($files, $allowed_errors=[E_WARNING])
     {
         // Require files
         ob_implicit_flush(0);
         ob_start();
         try {
             foreach ($files as $file) {
+                // require because include will not throw the adminer_exit error
                 require($file);
             }
-        } catch (\Exception $e) {
-            if (!in_array($e->getSeverity(), $allowed_exceptions)) {
+        } catch (\ErrorException $e) {
+            if (!in_array($e->getSeverity(), $allowed_errors)) {
                 throw $e;
             }
         }

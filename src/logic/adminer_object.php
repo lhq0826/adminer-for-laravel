@@ -11,13 +11,13 @@ function adminer_object()
         // Nothing to do
     }
     $plugins = [];
-    $plugin_file = $lumener_controller->plugins_path.'/plugin.php';
+    $plugin_file = $lumener_controller->getPluginsPath().'/plugin.php';
     if (file_exists($plugin_file)) {
         // required to run any plugin
         include_once $plugin_file;
 
         // autoloader
-        foreach (glob($lumener_controller->plugins_path."/*.php") as $filename) {
+        foreach (glob($lumener_controller->getPluginsPath()."/*.php") as $filename) {
             include_once $filename;
         }
 
@@ -73,7 +73,7 @@ function adminer_object()
             global $lumener_controller;
             $theme = LUMENER_STORAGE.'/adminer.css';
             if (file_exists($theme)) {
-                return [$lumener_controller->request->getPathInfo()
+                return [$lumener_controller->getRequest()->getPathInfo()
                 .'/resources?file=adminer%2Ecss&type=text%2Fcss'];
             }
             return [];
@@ -105,7 +105,7 @@ function adminer_object()
     // User extensions
     $ext = config('lumener.adminer.extension_file');
     if (file_exists($ext)) {
-        return include($ext);
+        return require($ext);
     }
 
     if (empty($plugins)) {

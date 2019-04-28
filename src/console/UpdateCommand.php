@@ -87,11 +87,11 @@ class UpdateCommand extends Command
             'https://api.github.com/repos/vrana/adminer/releases/latest'
         );
         if (config('lumener.adminer.version_type', 'url') == 'url') {
-            $version = $this->_getLatestAdminerVersion();
-            $this->info("Lumener: Latest Adminer Version " . $latest_version);
+            $version = $this->_getLatestAdminerVersion($vsource);
+            $this->info("Lumener: Latest Adminer Version " . $version);
         } else {
             $version = $vsource;
-            $this->info("Lumener: Required Adminer Version " . $latest_version);
+            $this->info("Lumener: Required Adminer Version " . $version);
         }
         if ($force || !file_exists($this->filename)
             || $version != $current_version) {
@@ -118,7 +118,7 @@ class UpdateCommand extends Command
      * Retreives the most recent adminer release version
      * @return string Version
      */
-    private function _getLatestAdminerVersion()
+    private function _getLatestAdminerVersion($vsource)
     {
         $this->info("Lumener: Checking latest adminer version...");
         $response = ShellHelper::get($vsource);
