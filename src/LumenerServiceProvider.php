@@ -111,9 +111,9 @@ class LumenerServiceProvider extends ServiceProvider
         // TODO: Merge routes for laravel
         \Route::namespace($this->namespace)
             ->group(function () {
-                Route::any($this->route_path, $this->route_options);
+                \Route::any($this->route_path, $this->route_options);
                 $this->route_options['uses'] = "LumenerController@getResource'";
-                Route::get($this->route_path.'/resources', $this->route_options);
+                \Route::get($this->route_path.'/resources', $this->route_options);
             });
     }
 

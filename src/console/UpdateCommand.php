@@ -20,11 +20,6 @@ use Lumener\Helpers\ShellHelper;
 class UpdateCommand extends Command
 {
     /**
-     * @var Filesystem $files
-     */
-    protected $files;
-
-    /**
      * @var String $version
      */
     protected $version;
@@ -103,7 +98,7 @@ class UpdateCommand extends Command
             $version = $vsource;
             $this->info("Lumener: Required Adminer Version " . $version);
         }
-        return $verison;
+        return $version;
     }
 
     /**
