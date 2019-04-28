@@ -20,11 +20,6 @@ use Lumener\Helpers\ShellHelper;
 class StylizeCommand extends Command
 {
     /**
-     * @var Filesystem $files
-     */
-    protected $files;
-
-    /**
      * @var String $theme
      */
     protected $theme;
@@ -35,15 +30,17 @@ class StylizeCommand extends Command
     protected $css_path;
 
     /**
+     * @var String $filename
+     */
+    protected $filename;
+
+    /**
      * The name and signature of the console command.
      *
      * @var string
      */
     protected $signature = 'lumener:stylize {--file=} {--url=}';
 
-    /**
-     * @param Filesystem $files
-     */
     public function __construct()
     {
         parent::__construct();

@@ -20,7 +20,8 @@ class LumenerController extends Controller
         && \Route::hasMiddlewareGroup('lumener')) {
             $this->middleware('lumener');
         }
-        // LumenerServiceProvider::register holds the middleware register so it does not need addeed manually.
+        // LumenerServiceProvider::register holds the middleware register
+        // so it does not need to be added manually.
         // User-defined middleware is handled during route definition for Lumen
         $this->adminer = LUMENER_STORAGE.'/adminer.php';
         $this->adminer_object = __DIR__.'/../logic/adminer_object.php';

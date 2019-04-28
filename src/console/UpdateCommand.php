@@ -41,9 +41,6 @@ class UpdateCommand extends Command
      */
     protected $signature = 'lumener:update {--force}';
 
-    /**
-     * @param Filesystem $files
-     */
     public function __construct()
     {
         parent::__construct();
@@ -66,11 +63,13 @@ class UpdateCommand extends Command
         try {
             if (file_exists($this->filename)) {
                 $fn = fopen($this->filename, "r");
-                for ($i=0; !$current_version && $i < 20 && !feof($fn); $i++) {
-                    $line = fgets($fn, 30);
-                    preg_match_all("/@version ((\d([\.-]|$))+)/", $line, $m);
-                    if (!empty($m[1])) {
-                        $current_version = $m[1][0];
+                if ($fn !== false) {
+                    for ($i=0; !$current_version && $i < 20 && !feof($fn); $i++) {
+                        $line = fgets($fn, 30);
+                        preg_match_all("/@version ((\d([\.-]|$))+)/", $line, $m);
+                        if (!empty($m[1])) {
+                            $current_version = $m[1][0];
+                        }
                     }
                 }
             }
@@ -82,6 +81,17 @@ class UpdateCommand extends Command
         } else {
             $this->error("Lumener: Adminer not found.");
         }
+        $version = $this->_getVersion();
+        if ($force || !file_exists($this->filename)
+            || $version != $current_version) {
+            $this->_downloadVersion($version);
+        } else {
+            $this->info('Lumener: Up to date.');
+        }
+    }
+
+    private function _getVersion()
+    {
         $vsource = config(
             'lumener.adminer_version',
             'https://api.github.com/repos/vrana/adminer/releases/latest'
@@ -93,12 +103,7 @@ class UpdateCommand extends Command
             $version = $vsource;
             $this->info("Lumener: Required Adminer Version " . $version);
         }
-        if ($force || !file_exists($this->filename)
-            || $version != $current_version) {
-            $this->_downloadVersion($version);
-        } else {
-            $this->info('Lumener: Up to date.');
-        }
+        return $verison;
     }
 
     /**

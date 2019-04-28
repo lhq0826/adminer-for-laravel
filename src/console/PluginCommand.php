@@ -20,11 +20,6 @@ use Lumener\Helpers\ShellHelper;
 class PluginCommand extends Command
 {
     /**
-     * @var Filesystem $files
-     */
-    protected $files;
-
-    /**
      * @var String $theme
      */
     protected $theme;
@@ -41,9 +36,6 @@ class PluginCommand extends Command
      */
     protected $signature = 'lumener:plugin {--file=} {--url=}';
 
-    /**
-     * @param Filesystem $files
-     */
     public function __construct()
     {
         parent::__construct();
