@@ -223,7 +223,7 @@ class AdminController{
 
  ## License
 
- The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+ The MIT License (MIT). Please see [License File](link-license) for more information.
 
  [ico-version]: https://img.shields.io/packagist/v/ognjenm/serverreqcheck.svg?style=flat-square
  [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
@@ -235,3 +235,4 @@ class AdminController{
  [link-packagist]: https://packagist.org/packages/hgists/lumener
  [link-author]: https://github.com/heshammeneisi
  [link-contributors]: ../../contributors
+ [link-license]: /LICENSE

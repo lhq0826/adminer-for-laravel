@@ -7,14 +7,22 @@
         {
             "name": "hesham",
             "email": "heshammeneisi@gmail.com"
+        },
+        {
+            "name": "leung",
+            "email": "simple@gmail.com"
+        },
+        {
+            "name": "Artistan",
+            "email": "artistan@gmail.com"
         }
     ],
     "require": {
         "guzzlehttp/guzzle": "^6.3"
     },
     "suggest": {
-        "illuminate/cookie": "Required for Lumen",
-        "illuminate/session": "Required for Lumen"
+        "illuminate/cookie": "Suggested for Lumen",
+        "illuminate/session": "Suggested for Lumen"
     },
     "autoload": {
         "psr-4": {
