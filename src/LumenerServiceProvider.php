@@ -39,9 +39,9 @@ class LumenerServiceProvider extends ServiceProvider
         }
         if (isset($route_options['middleware'])) {
             $route_options['middleware'] =
-             array_unique(array_merge(
-                 array_keys($this->middleware),
-                 is_array($route_options['middleware']) ?
+                array_unique(array_merge(
+                    array_keys($this->middleware),
+                    is_array($route_options['middleware']) ?
                   $route_options['middleware'] : [$route_options['middleware']]
             ));
         } else {
@@ -77,9 +77,9 @@ class LumenerServiceProvider extends ServiceProvider
             foreach ($route['action'] as $key => $value) {
                 if ($key == "middleware") {
                     $this->route_options['middleware'] =
-                     array_unique(array_merge(
-                         $this->route_options['middleware'],
-                         is_array($value) ? $value : [$value]
+                        array_unique(array_merge(
+                            $this->route_options['middleware'],
+                            is_array($value) ? $value : [$value]
                     ));
                 } elseif ($key == "uses") {
                     $this->route_options[$key] = "\\{$value}";
@@ -101,7 +101,7 @@ class LumenerServiceProvider extends ServiceProvider
             $router->get(
                 $this->route_path.'/resources',
                 ['uses' => 'LumenerController@getResource',
-                 'as' => 'lumener-resources']
+                    'as' => 'lumener-resources']
             );
         });
     }
@@ -178,6 +178,6 @@ class LumenerServiceProvider extends ServiceProvider
                 'command.lumener.update',
                 'command.lumener.stylize',
                 'command.lumener.plugin'
-             ];
+                ];
     }
 }
