@@ -1,17 +1,13 @@
 {
     "name": "hgists/lumener",
     "description": "Adminer for Lumen/Laravel 5.*",
-    "keywords": ["adminer", "lumen", "laravel"],
+    "keywords": ["adminer", "lumen", "laravel", "plugins", "themes"],
     "license": "MIT",
     "authors": [
         {
             "name": "hesham",
             "email": "heshammeneisi@gmail.com"
-        },
-        {
-           "name": "leung",
-           "email": "simple@gmail.com"
-       }
+        }
     ],
     "require": {
         "guzzlehttp/guzzle": "^6.3"
