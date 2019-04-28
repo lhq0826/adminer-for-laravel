@@ -10,9 +10,7 @@
 namespace Lumener\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Client;
+use Lumener\Helpers\ShellHelper;
 
 /**
  * A command to update the file for adminer.php
@@ -46,15 +44,11 @@ class UpdateCommand extends Command
     /**
      * @param Filesystem $files
      */
-    public function __construct(Filesystem $files)
+    public function __construct()
     {
         parent::__construct();
-        $this->files = $files;
 
-        $resources = realpath(dirname(__FILE__).'/../resources');
-        // $this->version = $resources.'/version';
-        $this->filename = $resources.'/adminer.php';
-        $this->tmpfile = $resources.'/tmp.php';
+        $this->filename = LUMENER_STORAGE.'/adminer.php';
     }
 
     /**
@@ -91,13 +85,13 @@ class UpdateCommand extends Command
             'lumener.adminer_version',
             'https://api.github.com/repos/vrana/adminer/releases/latest'
         );
-        if (config('lumener.version_source', 'url') == 'url') {
+        if (config('lumener.adminer.version_type', 'url') == 'url') {
             $this->info("Lumener: Checking latest adminer version...");
-            $response = $this->get($vsource);
+            $response = ShellHelper::get($vsource);
             if (!$response || $response->getStatusCode() != '200') {
                 $this->error('Lumener: Could not retrieve version information from url. '
             .
-            ($response ? "\r\n[{$response->getStatusCode()}] {$response->getReasonPhrase()} {(string)$response->getBody()}" : "Connection Failed."));
+            ($response ? "\r\n[{$response->getStatusCode()}] {$response->getReasonPhrase()} {(string)$response->getBody()}" : "Connection Failed.\r\n" . ShellHelper::$LastError));
                 return;
             }
             $latest_version = ltrim(json_decode((string) $response->getBody())->tag_name, 'v');
@@ -109,20 +103,19 @@ class UpdateCommand extends Command
         if ($force || !file_exists($this->filename) || $latest_version != $current_version) {
             $this->info("Lumener: Downloading...");
             $url = config(
-                'lumener.adminer_source',
+                'lumener.adminer.source',
                 'https://github.com/vrana/adminer/releases/download/v{version}/adminer-{version}.php'
             );
-            $url = str_replace("{version}", ltrim($latest_version, 'v'));
-            $response = $this->get($url, ['sink' => $this->filename]);
+            $url = str_replace("{version}", ltrim($latest_version, 'v'), $url);
+            $response = ShellHelper::get($url, ['sink' => $this->filename]);
             if ($response && $response->getStatusCode() == '200') {
                 info("Renaming redundant variables...");
                 $this->renameRedundant();
-                // $this->files->put($this->version, $latest_version);
                 $this->info("Lumener: Updated!");
             } else {
                 $this->error('Lumener: Could not download adminer.'
                 .
-                ($response ? "\r\n[{$response->getStatusCode()}] {$response->getReasonPhrase()} {(string)$response->getBody()}" : "Connection Failed."));
+                ($response ? "\r\n[{$response->getStatusCode()}] {$response->getReasonPhrase()} {(string)$response->getBody()}" : "Connection Failed.\r\n" . ShellHelper::$LastError));
                 return;
             }
         } else {
@@ -131,44 +124,15 @@ class UpdateCommand extends Command
     }
 
     /**
-     * @param       $uri
-     * @param array $params
-     *
-     * @return bool|mixed|\Psr\Http\Message\ResponseInterface
-     */
-    private function get($uri, $params=[])
-    {
-        try {
-            $client = new Client(); //GuzzleHttp\Client
-            return $client->request('GET', $uri, $params);
-        } catch (GuzzleException $e) {
-            $this->error($e->getMessage());
-        }
-        return false;
-    }
-
-    /**
      * Rename functions already defined in Laravel/Lumen public helper
      */
     private function renameRedundant()
     {
-        foreach (config('lumener.redundant_vars', ['redirect','cookie','view']) as $var) {
-            $this->rename($var);
-        }
-    }
-
-    /**
-     * Execute the sed command
-     *
-     * @param $string
-     */
-    private function rename($string)
-    {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            // TODO: Test this on windows
-            echo shell_exec("cat \"{$this->filename}\" | %{_ -replace \"([\\[\\)\\(\\\;\\{\\}]|^)'{$string}\",\"$1adminer_{$string}\"} > \"{$this->filename}\"");
-        } else {
-            echo shell_exec('LC_ALL=C sed -i -r \'s/([)(\;{}]|^)'.$string.'/\1adminer_'.$string.'/g\' '."\"{$this->filename}\"");
+        foreach (config(
+            'lumener.adminer.rename_list',
+            ['redirect','cookie','view', 'exit', 'ob_flush']
+        ) as $var) {
+            ShellHelper::rename($var, $this->filename);
         }
     }
 }

@@ -5,15 +5,14 @@ namespace Lumener;
 use Illuminate\Support\ServiceProvider;
 use Lumener\Console\UpdateCommand;
 use Lumener\Console\StylizeCommand;
+use Lumener\Console\PluginCommand;
 
 class LumenerServiceProvider extends ServiceProvider
 {
     protected $namespace = 'Lumener\Controllers';
     protected $middleware = [
-            'encrypt_cookies' => \Illuminate\Cookie\Middleware\EncryptCookies::class,
-            'add_queue_cookies' => \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            'start_session' => \Illuminate\Session\Middleware\StartSession::class
-        ];
+        'start_session' => \Illuminate\Session\Middleware\StartSession::class
+    ];
     /**
      * Bootstrap the application services.
      *
@@ -21,15 +20,32 @@ class LumenerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->publishes([
-          __DIR__.'/public/adminer.css' => base_path('public'),
-        ], 'public');
-        $this->publishes([
-          __DIR__.'/config/lumener.php' => base_path('config'),
-        ], 'config');
-        $this->loadViewsFrom(__DIR__.'/views', 'adminer');
-        $this->path = config('lumener.route', 'lumener');
-        $this->name = 'lumener';
+        define("LUMENER_STORAGE", config('lumener.storage', base_path('storage/lumener')));
+        if (!is_dir(LUMENER_STORAGE)) {
+            mkdir(LUMENER_STORAGE);
+        }
+
+        $this->route_path = config('lumener.route.path', 'lumener');
+
+        $route_options = config('lumener.route.options', []);
+        if (!isset($route_options['as'])) {
+            $route_options['as'] = 'lumener';
+        }
+        if (!isset($route_options['uses'])) {
+            $route_options['uses'] = 'LumenerController@index';
+        }
+        if (isset($route_options['middleware'])) {
+            $route_options['middleware'] =
+             array_unique(array_merge(
+                 array_keys($this->middleware),
+                 is_array($route_options['middleware']) ?
+                  $route_options['middleware'] : [$route_options['middleware']]
+            ));
+        } else {
+            $route_options['middleware'] = array_keys($this->middleware);
+        }
+        $this->route_options = $route_options;
+        $this->route_name = $route_options['as'];
         $this->map();
     }
 
@@ -40,39 +56,53 @@ class LumenerServiceProvider extends ServiceProvider
 
     public function mapAdminerRoutes()
     {
+        $mode = config('lumener.mode', 'standalone');
         if (method_exists(\Route::class, "middleware")) {
             // Laravel
-            // $url = route($this->name);
-            // if ($url) {
-            //     // TODO: Merge routes for laravel
-            //     $this->path = $url;
-            // }
-            \Route::middleware(array_keys($this->middleware))
-                ->namespace($this->namespace)
+            // TODO: Merge routes for laravel
+            \Route::namespace($this->namespace)
                 ->group(function () {
-                    Route::any($this->path, 'LumenerController@index');
+                    Route::any($this->route_path, $this->route_options);
+                    $this->route_options['uses'] = "LumenerController@getResource'";
+                    Route::get($this->route_path.'/resources', $this->route_options);
                 });
         } else {
             // Lumen
+
             $named = $this->app->router->namedRoutes;
-            if (isset($named[$this->name])) {
-                $uri = $named[$this->name];
+            if (isset($named[$this->route_name])) {
+                unset($this->app->router->namedRoutes[$this->route_name]);
+                $uri = $named[$this->route_name];
                 $route = $this->app->router->getRoutes()[$uri];
-                $this->middleware = array_unique(array_merge(
-                    array_keys($this->middleware),
-                    $route['action']['middleware']
-                ));
-                $this->path = $uri;
+                foreach ($route['action'] as $key => $value) {
+                    if ($key == "middleware") {
+                        $this->route_options['middleware'] =
+                         array_unique(array_merge(
+                             $this->route_options['middleware'],
+                             is_array($value) ? $value : [$value]
+                        ));
+                    } elseif ($key == "uses") {
+                        $this->route_options[$key] = "\\{$value}";
+                    } else {
+                        $this->route_options[$key] = $value;
+                    }
+                }
+                $this->route_path = $uri;
             }
-            $this->app->router->group([
-                'namespace' => $this->namespace,
-                'middleware' => $this->middleware,
-                'as' => $this->name
-            ], function ($router) {
+            $this->route_options['namespace'] = $this->namespace;
+            $this->app->router->group($this->route_options, function ($router) {
                 $router->addRoute(
                     ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-                    $this->path,
-                    'LumenerController@index'
+                    $this->route_path,
+                    ['uses' => $this->route_options['uses']]
+                );
+                // dd($this->app->router->getRoutes()['GET/admin/lumener']['action']['middleware']);
+                $this->route_options['as'] = "lumener-resources";
+                $this->route_options['uses'] = 'LumenerController@getResource';
+                $router->get(
+                    $this->route_path . '/resources',
+                    ['uses' => 'LumenerController@getResource',
+                     'as' => 'lumener-resources']
                 );
             });
         }
@@ -89,7 +119,7 @@ class LumenerServiceProvider extends ServiceProvider
             // Lumen
             $this->app->routeMiddleware(
                 $this->middleware
-                );
+            );
         } elseif (!method_exists($this->app['router'], 'middleware')) {
             // Laravel 5.4 no longer has middleware function on the router class
             foreach ($this->middleware as $alias => $class) {
@@ -105,31 +135,26 @@ class LumenerServiceProvider extends ServiceProvider
         $this->app->singleton(
             'command.lumener.update',
             function ($app) {
-                return new UpdateCommand($app['files']);
+                return new UpdateCommand();
             }
-        );
-        $this->commands(
-            'command.lumener.update'
         );
 
         $this->app->singleton(
             'command.lumener.stylize',
             function ($app) {
-                return new StylizeCommand($app['files']);
+                return new StylizeCommand();
             }
         );
-        $this->commands(
-            'command.lumener.stylize'
-        );
-
         $this->app->singleton(
             'command.lumener.plugin',
             function ($app) {
-                return new PluginCommand($app['files']);
+                return new PluginCommand();
             }
         );
         $this->commands(
-            'command.lumener.plugin'
+            ['command.lumener.update',
+            'command.lumener.stylize',
+            'command.lumener.plugin']
         );
     }
 

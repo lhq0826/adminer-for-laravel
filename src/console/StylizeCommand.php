@@ -10,9 +10,7 @@
 namespace Lumener\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Client;
+use Lumener\Helpers\ShellHelper;
 
 /**
  * A command to update the file for adminer.php
@@ -46,14 +44,13 @@ class StylizeCommand extends Command
     /**
      * @param Filesystem $files
      */
-    public function __construct(Filesystem $files)
+    public function __construct()
     {
         parent::__construct();
         $resources = realpath(dirname(__FILE__).'/../resources');
-        $this->files = $files;
-        $this->theme = realpath(dirname(__FILE__).'/../public/adminer.css');
-        $this->css_path = base_path('public/adminer.css');
-        $this->filename = $resources.'/adminer.php';
+        $this->theme = $resources.'/default.css';
+        $this->css_path = LUMENER_STORAGE.'/adminer.css';
+        $this->filename = LUMENER_STORAGE.'/adminer.php';
     }
 
     /**
@@ -67,14 +64,13 @@ class StylizeCommand extends Command
         if ($url) {
             $this->info("Downloading theme...");
             $path = tempnam(sys_get_temp_dir(), 'adminer.css');
-            $response = $this->get($url, ['sink' => $path]);
+            $response = ShellHelper::get($url, ['sink' => $path]);
             if ($response && $response->getStatusCode() == '200') {
-                $this->copy($path, $this->css_path);
                 $this->info("Lumener: Theme downloaded.");
             } else {
                 $this->error('Lumener: Could not retrieve theme file. '
                 .
-                ($response ? "\r\n[{$response->getStatusCode()}] {$response->getReasonPhrase()} {(string)$response->getBody()}" : "Connection Failed."));
+                ($response ? "\r\n[{$response->getStatusCode()}] {$response->getReasonPhrase()} {(string)$response->getBody()}" : "Connection Failed.\r\n" . ShellHelper::$LastError));
                 return;
             }
         } else {
@@ -86,60 +82,8 @@ class StylizeCommand extends Command
                 $path = $this->theme;
             }
         }
-        $this->copy($path, $this->css_path);
+        ShellHelper::copy($path, $this->css_path);
         // info("Fixing adminer.css url...");
-        // $this->replace("\\\$I\\[\\]=\\\$Uc", "\$I\\[\\]='/'.\$Uc", $this->filename);
-    }
-
-    /**
-     * @param       $uri
-     * @param array $params
-     *
-     * @return bool|mixed|\Psr\Http\Message\ResponseInterface
-     */
-    private function get($uri, $params=[])
-    {
-        try {
-            $client = new Client(); //GuzzleHttp\Client
-            return $client->request('GET', $uri, $params);
-        } catch (GuzzleException $e) {
-            $this->error($e->getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * copy files
-     *
-     * @param $string
-     */
-    private function copy($source, $dest)
-    {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            echo shell_exec("copy \"{$source}\" \"{$dest}\"");
-        } else {
-            echo shell_exec("cp \"{$source}\" \"{$dest}\"");
-        }
-    }
-
-    /**
-     * Replace portions of the file
-     * @param  string $pattern
-     * @param  string $replacement
-     * @param  string $file
-     * @return void
-     */
-    private function replace($pattern, $replacement, $file)
-    {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            // TODO: Test this on windows
-            echo shell_exec("cat \"{$file}\" | %{_ -replace \"$pattern\",\"{$replacement}\"} > \"{$file}\"");
-        } else {
-            $rule = '%([/])%';
-            $pattern = preg_replace($rule, '\\\\$0', $pattern);
-            $replacement = preg_replace($rule, '\\\\$0', $replacement);
-            $arg = escapeshellarg("s/{$pattern}/{$replacement}/g");
-            echo shell_exec("LC_ALL=C sed -i -r {$arg} \"{$file}\"");
-        }
+        // ShellHelper::replace("\\\$I\\[\\]=\\\$Uc", "\$I\\[\\]='/'.\$Uc", $this->filename);
     }
 }
