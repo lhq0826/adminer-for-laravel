@@ -1,10 +1,15 @@
 <?php
+use Illuminate\Http\Request;
+
 class AdminController
 {
+    protected $request;
+
     public function __construct(Request $request)
     {
         $this->request = $request;
     }
+    
     public function lumener()
     {
         // If you are using a Content Seucrity Policy, define it here

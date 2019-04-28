@@ -10,6 +10,9 @@ use Lumener\Console\PluginCommand;
 class LumenerServiceProvider extends ServiceProvider
 {
     protected $namespace = 'Lumener\Controllers';
+    protected $route_options;
+    protected $route_path;
+    protected $route_name;
     protected $middleware = [
         // 'start_session' => \Illuminate\Session\Middleware\StartSession::class
     ];
@@ -56,7 +59,6 @@ class LumenerServiceProvider extends ServiceProvider
 
     public function mapAdminerRoutes()
     {
-        $mode = config('lumener.mode', 'standalone');
         if (method_exists(\Route::class, "middleware")) {
             // Laravel
             // TODO: Merge routes for laravel
@@ -96,7 +98,6 @@ class LumenerServiceProvider extends ServiceProvider
                     $this->route_path,
                     ['uses' => $this->route_options['uses']]
                 );
-                // dd($this->app->router->getRoutes()['GET/admin/lumener']['action']['middleware']);
                 $this->route_options['as'] = "lumener-resources";
                 $this->route_options['uses'] = 'LumenerController@getResource';
                 $router->get(

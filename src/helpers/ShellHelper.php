@@ -24,7 +24,6 @@ class ShellHelper
             self::$LastError = $e->getMessage();
             return false;
         }
-        return false;
     }
 
     /**
@@ -71,7 +70,7 @@ class ShellHelper
     {
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             // TODO: Test this on windows
-            echo shell_exec("cat \"{$this->filename}\" | %{_ -replace \"([\\[\\)\\(\\\;\\{\\}]|^)'{$string}\",\"$1adminer_{$string}\"} > \"{$this->filename}\"");
+            echo shell_exec("cat \"{$filename}\" | %{_ -replace \"([\\[\\)\\(\\\;\\{\\}]|^)'{$string}\",\"$1adminer_{$string}\"} > \"{$filename}\"");
         } else {
             echo shell_exec('LC_ALL=C sed -i -r \'s/([)(\;{}]|^)'.$string.'/\1adminer_'.$string.'/g\' '."\"{$filename}\"");
         }

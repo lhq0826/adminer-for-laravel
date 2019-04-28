@@ -1,20 +1,13 @@
 <?php
+// Lumener and $plugins are already defined before this file is included
 class ExtendedLumener extends Lumener
 {
-    protected $disabled = ["mysql", "information_schema"];
-
-    public function databases($flush = true)
+    public function permanentLogin()
     {
-        $return = array();
-        foreach (get_databases($flush) as $db) {
-            if (!in_array(strtolower($db), $this->disabled)) {
-                $return[] = $db;
-            }
-        }
-        return $return;
+        // key used for permanent login
+        return 'ca41d8e9879df648e9a43cefa97bc12d';
     }
 }
-
 
 if (empty($plugins)) {
     return new ExtendedLumener();

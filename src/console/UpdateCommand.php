@@ -75,6 +75,7 @@ class UpdateCommand extends Command
                 }
             }
         } catch (\Throwable $e) {
+            // current_version is false
         }
         if ($current_version) {
             $this->info("Lumener: Current ".$current_version);
@@ -86,38 +87,15 @@ class UpdateCommand extends Command
             'https://api.github.com/repos/vrana/adminer/releases/latest'
         );
         if (config('lumener.adminer.version_type', 'url') == 'url') {
-            $this->info("Lumener: Checking latest adminer version...");
-            $response = ShellHelper::get($vsource);
-            if (!$response || $response->getStatusCode() != '200') {
-                $this->error('Lumener: Could not retrieve version information from url. '
-            .
-            ($response ? "\r\n[{$response->getStatusCode()}] {$response->getReasonPhrase()} {(string)$response->getBody()}" : "Connection Failed.\r\n" . ShellHelper::$LastError));
-                return;
-            }
-            $latest_version = ltrim(json_decode((string) $response->getBody())->tag_name, 'v');
+            $version = $this->_getLatestAdminerVersion();
             $this->info("Lumener: Latest Adminer Version " . $latest_version);
         } else {
-            $latest_version = $vsource;
+            $version = $vsource;
             $this->info("Lumener: Required Adminer Version " . $latest_version);
         }
-        if ($force || !file_exists($this->filename) || $latest_version != $current_version) {
-            $this->info("Lumener: Downloading...");
-            $url = config(
-                'lumener.adminer.source',
-                'https://github.com/vrana/adminer/releases/download/v{version}/adminer-{version}.php'
-            );
-            $url = str_replace("{version}", ltrim($latest_version, 'v'), $url);
-            $response = ShellHelper::get($url, ['sink' => $this->filename]);
-            if ($response && $response->getStatusCode() == '200') {
-                info("Renaming redundant variables...");
-                $this->renameRedundant();
-                $this->info("Lumener: Updated!");
-            } else {
-                $this->error('Lumener: Could not download adminer.'
-                .
-                ($response ? "\r\n[{$response->getStatusCode()}] {$response->getReasonPhrase()} {(string)$response->getBody()}" : "Connection Failed.\r\n" . ShellHelper::$LastError));
-                return;
-            }
+        if ($force || !file_exists($this->filename)
+            || $version != $current_version) {
+            $this->_downloadVersion($version);
         } else {
             $this->info('Lumener: Up to date.');
         }
@@ -126,13 +104,70 @@ class UpdateCommand extends Command
     /**
      * Rename functions already defined in Laravel/Lumen public helper
      */
-    private function renameRedundant()
+    private function _patchAdminer()
     {
         foreach (config(
             'lumener.adminer.rename_list',
             ['redirect','cookie','view', 'exit', 'ob_flush']
         ) as $var) {
             ShellHelper::rename($var, $this->filename);
+        }
+    }
+
+    /**
+     * Retreives the most recent adminer release version
+     * @return string Version
+     */
+    private function _getLatestAdminerVersion()
+    {
+        $this->info("Lumener: Checking latest adminer version...");
+        $response = ShellHelper::get($vsource);
+        if (!$response || $response->getStatusCode() != '200') {
+            $this->error(
+                'Lumener: Could not retrieve version information from url.'
+                .
+                (
+                    $response ? "\r\n[{$response->getStatusCode()}]
+                    {$response->getReasonPhrase()} {(string)$response->getBody()}"
+                    : "Connection Failed.\r\n" . ShellHelper::$LastError
+                )
+            );
+            return;
+        }
+        return
+            ltrim(json_decode((string) $response->getBody())->tag_name, 'v');
+    }
+
+    /**
+     * Downloads the speicifed adminer.php version
+     * @param  string $version
+     * @return bool Success
+     */
+    private function _downloadVersion($version)
+    {
+        $this->info("Lumener: Downloading...");
+        $url = config(
+            'lumener.adminer.source',
+            'https://github.com/vrana/adminer/releases/download/v{version}/adminer-{version}.php'
+        );
+        $url = str_replace("{version}", ltrim($version, 'v'), $url);
+        $response = ShellHelper::get($url, ['sink' => $this->filename]);
+        if ($response && $response->getStatusCode() == '200') {
+            $this->info("Patching adminer.php...");
+            $this->_patchAdminer();
+            $this->info("Lumener: Updated!");
+            return true;
+        } else {
+            $this->error(
+                'Lumener: Could not download adminer.php.'
+                .
+                (
+                    $response ? "\r\n[{$response->getStatusCode()}]
+                    {$response->getReasonPhrase()} {(string)$response->getBody()}"
+                    : "Connection Failed.\r\n" . ShellHelper::$LastError
+                )
+            );
+            return false;
         }
     }
 }

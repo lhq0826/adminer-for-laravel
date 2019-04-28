@@ -1,6 +1,9 @@
 # Lumener
 
-[![Latest Version on Packagist][ico-version]][link-packagist] [![Software License][ico-license]](LICENSE.md)
+[![Scrutinizer Code Quality][ico-quality]][link-quality]
+[![Build Status][ico-build]][link-build]
+[![Latest Packagist Version][ico-version]][link-packagist]
+[![Software License][ico-license]](LICENSE.md)
 
 [Adminer](https://www.adminer.org) is a full-featured database management tool written in PHP.
 This package integrates the adminer interface into your Lumen or Laravel project by acting as a wrapper and taking care of incompatibility issues. Lumener also provides means to update, stylize or extend adminer through the artisan commands.
@@ -223,16 +226,16 @@ class AdminController{
 
  ## License
 
- The MIT License (MIT). Please see [License File](link-license) for more information.
+ The MIT License (MIT). Please see [License File][link-license] for more information.
 
  [ico-version]: https://img.shields.io/packagist/v/ognjenm/serverreqcheck.svg?style=flat-square
  [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
- [ico-travis]: https://img.shields.io/travis/ognjenm/serverreqcheck/master.svg?style=flat-square
- [ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/ognjenm/serverreqcheck.svg?style=flat-square
- [ico-code-quality]: https://img.shields.io/scrutinizer/g/ognjenm/serverreqcheck.svg?style=flat-square
- [ico-downloads]: https://img.shields.io/packagist/dt/ognjenm/serverreqcheck.svg?style=flat-square
+ [ico-build]: https://scrutinizer-ci.com/g/HeshamMeneisi/Lumener/badges/build.png?b=master
+ [ico-quality]: https://scrutinizer-ci.com/g/HeshamMeneisi/Lumener/badges/quality-score.png?b=master
 
  [link-packagist]: https://packagist.org/packages/hgists/lumener
+ [link-quality]:   https://scrutinizer-ci.com/g/HeshamMeneisi/Lumener/?branch=master
+ [link-build]: https://scrutinizer-ci.com/g/HeshamMeneisi/Lumener/build-status/master
  [link-author]: https://github.com/heshammeneisi
  [link-contributors]: ../../contributors
  [link-license]: /LICENSE
