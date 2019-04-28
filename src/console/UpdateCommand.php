@@ -59,7 +59,7 @@ class UpdateCommand extends Command
             if (file_exists($this->filename)) {
                 $fn = fopen($this->filename, "r");
                 if ($fn !== false) {
-                    for ($i=0; !$current_version && $i < 20 && !feof($fn); $i++) {
+                    for ($i = 0; !$current_version && $i < 20 && !feof($fn); $i++) {
                         $line = fgets($fn, 30);
                         preg_match_all("/@version ((\d([\.-]|$))+)/", $line, $m);
                         if (!empty($m[1])) {
@@ -93,10 +93,10 @@ class UpdateCommand extends Command
         );
         if (config('lumener.adminer.version_type', 'url') == 'url') {
             $version = $this->_getLatestAdminerVersion($vsource);
-            $this->info("Lumener: Latest Adminer Version " . $version);
+            $this->info("Lumener: Latest Adminer Version ".$version);
         } else {
             $version = $vsource;
-            $this->info("Lumener: Required Adminer Version " . $version);
+            $this->info("Lumener: Required Adminer Version ".$version);
         }
         return $version;
     }
@@ -108,7 +108,7 @@ class UpdateCommand extends Command
     {
         foreach (config(
             'lumener.adminer.rename_list',
-            ['redirect','cookie','view', 'exit', 'ob_flush']
+            ['redirect', 'cookie', 'view', 'exit', 'ob_flush']
         ) as $var) {
             ShellHelper::rename($var, $this->filename);
         }
@@ -129,7 +129,7 @@ class UpdateCommand extends Command
                 (
                     $response ? "\r\n[{$response->getStatusCode()}]
                     {$response->getReasonPhrase()} {(string)$response->getBody()}"
-                    : "Connection Failed.\r\n" . ShellHelper::$LastError
+                    : "Connection Failed.\r\n".ShellHelper::$LastError
                 )
             );
             return;
@@ -164,7 +164,7 @@ class UpdateCommand extends Command
                 (
                     $response ? "\r\n[{$response->getStatusCode()}]
                     {$response->getReasonPhrase()} {(string)$response->getBody()}"
-                    : "Connection Failed.\r\n" . ShellHelper::$LastError
+                    : "Connection Failed.\r\n".ShellHelper::$LastError
                 )
             );
             return false;
