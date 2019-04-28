@@ -1,5 +1,7 @@
 # Lumener
 
+[![Latest Version on Packagist][ico-version]][link-packagist] [![Software License][ico-license]](LICENSE.md)
+
 [Adminer](https://www.adminer.org) is a full-featured database management tool written in PHP.
 This package integrates the adminer interface into your Lumen or Laravel project by acting as a wrapper and taking care of incompatibility issues. Lumener also provides means to update, stylize or extend adminer through the artisan commands.
 
@@ -22,31 +24,7 @@ php artisan lumener:update
 # [Optional] Apply theme
 php artisan lumener:stylize
 ```
-For Lumen or Laravel 5.4 or older, see the next two sections.
-***
-## Additional Steps [***Lumen Only***]
-Adminer uses cookies to store the user session. If you haven't already, you must enable cookies and session.
-
-#### Extra Packages
-You must manually require the cookie and session packages.
-```bash
-composer require illuminate/cookie
-composer require illuminate/session
-```
-#### Binding Session
-Then you must add the required bindings in `bootstrap/app.php` before `return $app;`
-```php
-// Enable cookies/session
-$app->singleton('cookie', function () use ($app) {
-    return $app->loadComponent('session', 'Illuminate\Cookie\CookieServiceProvider', 'cookie');
-});
-$app->bind(Illuminate\Session\SessionManager::class, function ($app) {
-    return $app->make('session');
-});
-$app->bind('Illuminate\Contracts\Cookie\QueueingFactory', 'cookie');
-$app->register(Illuminate\Session\SessionServiceProvider::class);
-$app->withFacades();
-```
+For Lumen or Laravel 5.4 or older, see the next section.
 ***
 
 ## Provider
@@ -237,3 +215,23 @@ class AdminController{
 }
 // Don't forget to use {!! $content !!} in blade as $content is HTML
  ```
+
+ ## Credits
+
+ - [Hesham Meneisi][link-author]
+ - [All Contributors][link-contributors]
+
+ ## License
+
+ The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+
+ [ico-version]: https://img.shields.io/packagist/v/ognjenm/serverreqcheck.svg?style=flat-square
+ [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
+ [ico-travis]: https://img.shields.io/travis/ognjenm/serverreqcheck/master.svg?style=flat-square
+ [ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/ognjenm/serverreqcheck.svg?style=flat-square
+ [ico-code-quality]: https://img.shields.io/scrutinizer/g/ognjenm/serverreqcheck.svg?style=flat-square
+ [ico-downloads]: https://img.shields.io/packagist/dt/ognjenm/serverreqcheck.svg?style=flat-square
+
+ [link-packagist]: https://packagist.org/packages/hgists/lumener
+ [link-author]: https://github.com/heshammeneisi
+ [link-contributors]: ../../contributors

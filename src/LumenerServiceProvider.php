@@ -11,7 +11,7 @@ class LumenerServiceProvider extends ServiceProvider
 {
     protected $namespace = 'Lumener\Controllers';
     protected $middleware = [
-        'start_session' => \Illuminate\Session\Middleware\StartSession::class
+        // 'start_session' => \Illuminate\Session\Middleware\StartSession::class
     ];
     /**
      * Bootstrap the application services.
